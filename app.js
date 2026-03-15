@@ -1902,22 +1902,16 @@ function _renderCategoryBars() {
 // ════════════════════════════════════════════════════════════════
 
 function _initAds() {
-  // Show ad after every N completions
-  const COMPLETIONS_BEFORE_AD = 5;
-  const completions = parseInt(localStorage.getItem('dca_completions') || '0', 10);
-
-  if (completions > 0 && completions % COMPLETIONS_BEFORE_AD === 0) {
-    DOM.adBanner?.classList.remove('hidden');
-  }
-
+  // Banner is always visible — close button hides it for this session only
   DOM.adClose?.addEventListener('click', () => {
     DOM.adBanner?.classList.add('hidden');
+    // Remove extra bottom padding when ad is dismissed
+    document.documentElement.style.setProperty('--ad-height', '0px');
     TG.Haptic.light();
   });
 
-  // Increment completion counter when user completes daily set
-  const prev = parseInt(localStorage.getItem('dca_completions') || '0', 10);
-  localStorage.setItem('dca_completions', prev + 1);
+  // Add bottom padding so tab content is not obscured by the ad
+  document.documentElement.style.setProperty('--ad-height', '58px');
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -2148,10 +2142,6 @@ function _initButtons() {
     );
   });
 
-  // Ad close
-  DOM.adClose?.addEventListener('click', () => {
-    DOM.adBanner?.classList.add('hidden');
-  });
 }
 
 function _resetAll() {
