@@ -1050,6 +1050,8 @@ function showSubjectPicker() {
   renderSubjectPicker();
   // Refresh Sunday Mega banner state
   _renderSundayMegaBanner();
+  // Trigger interstitial ad (max once per 5 min)
+  try { _triggerInterstitial(); } catch(e) {}
   TG.Haptic.select();
 }
 
@@ -1912,6 +1914,26 @@ function _initAds() {
 
   // Add bottom padding so tab content is not obscured by the ad
   document.documentElement.style.setProperty('--ad-height', '58px');
+}
+
+// ── Interstitial trigger — fires on home screen, max once per 5 min ──
+let _lastInterstitialTime = 0;
+const INTERSTITIAL_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
+function _triggerInterstitial() {
+  const now = Date.now();
+  if (now - _lastInterstitialTime < INTERSTITIAL_INTERVAL_MS) return;
+  _lastInterstitialTime = now;
+  // The AdsTerra interstitial script auto-fires when conditions are met.
+  // We reload the script tag to re-trigger it on each home visit.
+  try {
+    const old = document.getElementById('adsterra-interstitial');
+    if (old) old.remove();
+    const s = document.createElement('script');
+    s.id  = 'adsterra-interstitial';
+    s.src = 'https://pl28922378.effectivegatecpm.com/0c/08/8f/0c088fdf4bbc496b06d783820dfaf2dc.js';
+    document.body.appendChild(s);
+  } catch(e) {}
 }
 
 // ════════════════════════════════════════════════════════════════
